@@ -4,6 +4,7 @@ import type { NewCoin, TrendingCoin } from "@/types";
 import TrendingTable from "@/components/trending/TrendingTable";
 import TradingViewChart from "@/components/charts/TradingViewChart";
 import CoinProfile from "@/components/coin/CoinProfile";
+import MajorCoinsPanel from "@/components/major-coins/MajorCoinsPanel";
 
 function newCoinToTrending(coin: NewCoin): TrendingCoin {
   return {
@@ -104,6 +105,8 @@ export default function Dashboard() {
 
   return (
     <div className="max-w-[1600px] mx-auto p-4 space-y-4">
+      <MajorCoinsPanel />
+
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">All Coins</h1>
         <div className="flex items-center gap-3">

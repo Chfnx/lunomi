@@ -8,6 +8,7 @@ import { apiLimiter } from "./shared/middleware/rateLimiter.js";
 import { setupWebSocket } from "./shared/websocket/index.js";
 import coinsRouter from "./modules/coins/routes.js";
 import trendingRouter from "./modules/trending/routes.js";
+import majorCoinsRouter from "./modules/major-coins/routes.js";
 import healthRouter from "./modules/health.js";
 
 const app = express();
@@ -21,6 +22,7 @@ app.use(apiLimiter);
 app.use("/api/health", healthRouter);
 app.use("/api/coins", coinsRouter);
 app.use("/api/trending", trendingRouter);
+app.use("/api/major-coins", majorCoinsRouter);
 
 app.use(errorHandler);
 

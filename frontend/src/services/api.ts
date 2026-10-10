@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { ApiResponse, NewCoin, TrendingCoin } from "@/types";
+import type { ApiResponse, NewCoin, TrendingCoin, MajorCoinAnalysis } from "@/types";
 
 const api = axios.create({
   baseURL: "/api",
@@ -37,6 +37,11 @@ export async function fetchHealth(): Promise<{
 }> {
   const { data } = await api.get("/health");
   return data;
+}
+
+export async function fetchMajorCoinsAnalysis(): Promise<MajorCoinAnalysis[]> {
+  const { data } = await api.get<ApiResponse<MajorCoinAnalysis[]>>("/major-coins/analysis");
+  return data.data;
 }
 
 export default api;

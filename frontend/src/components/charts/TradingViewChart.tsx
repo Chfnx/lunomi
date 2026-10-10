@@ -35,6 +35,9 @@ function TradingViewChart({ symbol = "BINANCE:BTCUSDT", chain, pairAddress }: Tr
       support_host: "https://www.tradingview.com",
       studies: [
         "STD;EMA",
+        "STD;Relative_Strength_Index",
+        "STD;MACD",
+        "STD;Bollinger_Bands",
         "STD;Fibonacci_Retracement",
       ],
       overrides: {

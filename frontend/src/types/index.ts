@@ -61,6 +61,38 @@ export interface TrendingCoin {
   };
 }
 
+export interface MajorCoinAnalysis {
+  symbol: string;
+  name: string;
+  price: number;
+  change24h: number;
+  indicators: {
+    rsi: number;
+    ema20: number;
+    ema50: number;
+    ema200: number;
+    macd: { value: number; signal: number; histogram: number };
+    bollinger: { upper: number; middle: number; lower: number; width: number };
+    support: number[];
+    resistance: number[];
+    currentPrice: number;
+  };
+  consolidation: {
+    isConsolidating: boolean;
+    rangeLow: number;
+    rangeHigh: number;
+    rangeWidth: number;
+    duration: string;
+    explanation: string;
+  };
+  signal: "strong_buy" | "buy" | "neutral" | "sell" | "strong_sell";
+  signalScore: number;
+  prediction: string;
+  analysis: string[];
+  chartLines: { label: string; value: number; color: string }[];
+  timestamp: string;
+}
+
 export interface ApiResponse<T> {
   data: T;
   count?: number;
