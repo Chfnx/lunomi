@@ -15,12 +15,19 @@ function formatPrice(price: number): string {
   return `$${price.toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
 }
 
-function CoinCard({ coin }: { coin: MajorCoinAnalysis }) {
-  const [expanded, setExpanded] = useState(false);
+interface CoinCardProps {
+  coin: MajorCoinAnalysis;
+  onSelect: (coin: MajorCoinAnalysis) => void;
+}
+
+function CoinCard({ coin, onSelect }: CoinCardProps) {
   const sig = signalConfig[coin.signal];
 
   return (
-    <div className="card">
+    <div
+      className="card cursor-pointer hover:border-blue-500/30 transition-colors"
+      onClick={() => onSelect(coin)}
+    >
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-3">
           <h3 className="text-lg font-bold">{coin.name}</h3>
@@ -69,73 +76,21 @@ function CoinCard({ coin }: { coin: MajorCoinAnalysis }) {
         </div>
       </div>
 
-      <div className="mb-3">
+      <div className="mb-2">
         <div className="text-[10px] text-gray-500 uppercase mb-1">Prediction</div>
         <p className="text-xs text-gray-300 leading-relaxed">{coin.prediction}</p>
       </div>
 
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="text-xs text-blue-400 hover:text-blue-300 mb-2"
-      >
-        {expanded ? "Hide details" : "Show analysis details"}
-      </button>
-
-      {expanded && (
-        <div className="space-y-2 mt-2 border-t border-surface-700 pt-2">
-          <div>
-            <div className="text-[10px] text-gray-500 uppercase mb-1">Technical Analysis</div>
-            <ul className="space-y-1">
-              {coin.analysis.map((line, i) => (
-                <li key={i} className="text-xs text-gray-400 flex items-start gap-1.5">
-                  <span className="text-gray-600 mt-0.5">-</span>
-                  {line}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <div className="text-[10px] text-gray-500 uppercase mb-1">Chart Lines</div>
-            <div className="flex flex-wrap gap-1.5">
-              {coin.chartLines.map((line, i) => (
-                <span
-                  key={i}
-                  className="text-[10px] px-1.5 py-0.5 rounded bg-surface-700 flex items-center gap-1"
-                >
-                  <span className="w-2 h-0.5 rounded" style={{ backgroundColor: line.color }} />
-                  <span className="text-gray-400">{line.label}</span>
-                  <span className="text-gray-500">{formatPrice(line.value)}</span>
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2">
-            {coin.indicators.support.length > 0 && (
-              <div>
-                <div className="text-[10px] text-gray-500 uppercase mb-1">Support</div>
-                {coin.indicators.support.map((s, i) => (
-                  <div key={i} className="text-xs text-emerald-400">{formatPrice(s)}</div>
-                ))}
-              </div>
-            )}
-            {coin.indicators.resistance.length > 0 && (
-              <div>
-                <div className="text-[10px] text-gray-500 uppercase mb-1">Resistance</div>
-                {coin.indicators.resistance.map((r, i) => (
-                  <div key={i} className="text-xs text-red-400">{formatPrice(r)}</div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      <div className="text-xs text-blue-400">Click for details & ATM simulation &rarr;</div>
     </div>
   );
 }
 
-export default function MajorCoinsPanel() {
+interface MajorCoinsPanelProps {
+  onCoinSelect?: (coin: MajorCoinAnalysis) => void;
+}
+
+export default function MajorCoinsPanel({ onCoinSelect }: MajorCoinsPanelProps) {
   const [coins, setCoins] = useState<MajorCoinAnalysis[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -167,7 +122,11 @@ export default function MajorCoinsPanel() {
       <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">Market Analysis</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {coins.map((coin) => (
-          <CoinCard key={coin.symbol} coin={coin} />
+          <CoinCard
+            key={coin.symbol}
+            coin={coin}
+            onSelect={(c) => onCoinSelect?.(c)}
+          />
         ))}
       </div>
     </div>

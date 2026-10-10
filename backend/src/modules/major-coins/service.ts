@@ -179,20 +179,20 @@ function detectConsolidation(candles: OHLCV[], coinName: string): ConsolidationA
 
   const isConsolidating = rangeWidth < 5 && cv < 2;
 
-  let duration = "~2 dagen";
-  if (rangeWidth < 3) duration = "~3-5 dagen";
+  let duration = "~2 days";
+  if (rangeWidth < 3) duration = "~3-5 days";
   if (rangeWidth < 2) duration = "~1 week+";
 
   let explanation = "";
   if (isConsolidating) {
     explanation =
-      `${coinName} beweegt zijwaarts in een nauwe range. Dit betekent dat kopers en verkopers in evenwicht zijn. ` +
-      "Een uitbraak (breakout) boven de bovenkant of onder de onderkant volgt vaak na zo'n consolidatie. " +
-      "Hoe langer de consolidatie, hoe krachtiger de daaropvolgende beweging.";
+      `${coinName} is moving sideways in a tight range. This means buyers and sellers are in balance. ` +
+      "A breakout above the upper or below the lower boundary often follows such consolidation. " +
+      "The longer the consolidation, the stronger the subsequent move.";
   } else {
     explanation =
-      "Geen duidelijke consolidatie gedetecteerd. De prijs beweegt met voldoende volatiliteit " +
-      "om een trendmatige beweging aan te geven.";
+      "No clear consolidation detected. The price is moving with sufficient volatility " +
+      "to indicate a trending movement.";
   }
 
   return { isConsolidating, rangeLow, rangeHigh, rangeWidth, duration, explanation };
@@ -245,30 +245,30 @@ function generatePrediction(indicators: TechnicalIndicators, consolidation: Cons
   const parts: string[] = [];
 
   if (consolidation.isConsolidating) {
-    const breakoutDirection = currentPrice > (consolidation.rangeLow + consolidation.rangeHigh) / 2 ? "omhoog" : "omlaag";
-    parts.push(`Consolidatie actief (${consolidation.rangeWidth.toFixed(1)}% range). Kans op breakout ${breakoutDirection}.`);
+    const breakoutDirection = currentPrice > (consolidation.rangeLow + consolidation.rangeHigh) / 2 ? "up" : "down";
+    parts.push(`Consolidation active (${consolidation.rangeWidth.toFixed(1)}% range). Breakout ${breakoutDirection} likely.`);
   }
 
   if (rsi < 35) {
-    parts.push("RSI in oversold zone — historisch gezien volgt vaak een bounce binnen 3-7 dagen.");
+    parts.push("RSI in oversold zone — historically a bounce often follows within 3-7 days.");
   } else if (rsi > 65) {
-    parts.push("RSI in overbought zone — kans op correctie of pullback is verhoogd.");
+    parts.push("RSI in overbought zone — risk of correction or pullback is elevated.");
   }
 
   if (macd.histogram > 0 && macd.value > macd.signal) {
-    parts.push("MACD bullish crossover — momentum draait positief.");
+    parts.push("MACD bullish crossover — momentum turning positive.");
   } else if (macd.histogram < 0 && macd.value < macd.signal) {
-    parts.push("MACD bearish — momentum is negatief.");
+    parts.push("MACD bearish — momentum is negative.");
   }
 
   if (currentPrice > ema200) {
-    parts.push("Prijs boven EMA200 — langetermijntrend is bullish.");
+    parts.push("Price above EMA200 — long-term trend is bullish.");
   } else {
-    parts.push("Prijs onder EMA200 — langetermijntrend is bearish.");
+    parts.push("Price below EMA200 — long-term trend is bearish.");
   }
 
   if (indicators.bollinger.width < 3) {
-    parts.push("Bollinger Bands zeer smal — grote beweging staat te wachten.");
+    parts.push("Bollinger Bands very narrow — large move expected.");
   }
 
   return parts.join(" ");
@@ -279,35 +279,35 @@ function generateAnalysis(indicators: TechnicalIndicators, consolidation: Consol
   const { rsi, ema20, ema50, ema200, macd, bollinger } = indicators;
   const price = indicators.currentPrice;
 
-  lines.push(`RSI(14): ${rsi.toFixed(1)} — ${rsi < 30 ? "oversold" : rsi > 70 ? "overbought" : "neutraal"}`);
+  lines.push(`RSI(14): ${rsi.toFixed(1)} — ${rsi < 30 ? "oversold" : rsi > 70 ? "overbought" : "neutral"}`);
   lines.push(`EMA20: $${ema20.toFixed(0)} | EMA50: $${ema50.toFixed(0)} | EMA200: $${ema200.toFixed(0)}`);
 
   if (ema20 > ema50 && ema50 > ema200) {
-    lines.push("EMA-stapeling bullish (20 > 50 > 200) — sterke opwaartse trendstructuur.");
+    lines.push("EMA stacking bullish (20 > 50 > 200) — strong uptrend structure.");
   } else if (ema20 < ema50 && ema50 < ema200) {
-    lines.push("EMA-stapeling bearish (20 < 50 < 200) — afwaartse trendstructuur.");
+    lines.push("EMA stacking bearish (20 < 50 < 200) — downtrend structure.");
   }
 
   lines.push(`MACD: ${macd.histogram > 0 ? "bullish" : "bearish"} (histogram: ${macd.histogram.toFixed(2)})`);
-  lines.push(`Bollinger: $${bollinger.lower.toFixed(0)} — $${bollinger.upper.toFixed(0)} (breedte: ${bollinger.width.toFixed(1)}%)`);
+  lines.push(`Bollinger: $${bollinger.lower.toFixed(0)} — $${bollinger.upper.toFixed(0)} (width: ${bollinger.width.toFixed(1)}%)`);
 
   if (consolidation.isConsolidating) {
-    lines.push(`Consolidatie: $${consolidation.rangeLow.toFixed(0)} — $${consolidation.rangeHigh.toFixed(0)} (${consolidation.duration})`);
+    lines.push(`Consolidation: $${consolidation.rangeLow.toFixed(0)} — $${consolidation.rangeHigh.toFixed(0)} (${consolidation.duration})`);
   }
 
   if (indicators.support.length > 0) {
     lines.push(`Support: ${indicators.support.map((s) => `$${s.toFixed(0)}`).join(", ")}`);
   }
   if (indicators.resistance.length > 0) {
-    lines.push(`Weerstand: ${indicators.resistance.map((r) => `$${r.toFixed(0)}`).join(", ")}`);
+    lines.push(`Resistance: ${indicators.resistance.map((r) => `$${r.toFixed(0)}`).join(", ")}`);
   }
 
   if (signal === "strong_buy" || signal === "buy") {
-    lines.push("Advies: gunstig inkoopmoment — technische indicaten wijzen op instap.");
+    lines.push("Advice: favorable entry — technical indicators suggest a buy opportunity.");
   } else if (signal === "neutral") {
-    lines.push("Advies: geen duidelijk inkoopmoment — wacht op meer bevestiging.");
+    lines.push("Advice: no clear entry point — wait for more confirmation.");
   } else {
-    lines.push("Advies: geen goed inkoopmoment — indicaten wijzen op te hoog risico.");
+    lines.push("Advice: not a good entry point — indicators suggest elevated risk.");
   }
 
   return lines;

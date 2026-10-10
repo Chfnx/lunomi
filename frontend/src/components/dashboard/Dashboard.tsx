@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { fetchNewCoins, fetchTrending, syncCoins, syncTrending } from "@/services/api";
-import type { NewCoin, TrendingCoin } from "@/types";
+import type { NewCoin, TrendingCoin, MajorCoinAnalysis } from "@/types";
 import TrendingTable from "@/components/trending/TrendingTable";
 import SimpleTableView from "@/components/trending/SimpleTableView";
 import TradingViewChart from "@/components/charts/TradingViewChart";
 import CoinProfile from "@/components/coin/CoinProfile";
 import MajorCoinsPanel from "@/components/major-coins/MajorCoinsPanel";
+import CoinDetailPage from "@/components/major-coins/CoinDetailPage";
 
 type ViewMode = "simple" | "detailed";
 
@@ -46,6 +47,7 @@ export default function Dashboard() {
   const [newCoins, setNewCoins] = useState<NewCoin[]>([]);
   const [trendingCoins, setTrendingCoins] = useState<TrendingCoin[]>([]);
   const [selectedCoin, setSelectedCoin] = useState<TrendingCoin | null>(null);
+  const [selectedMajorCoin, setSelectedMajorCoin] = useState<MajorCoinAnalysis | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("simple");
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
@@ -107,6 +109,15 @@ export default function Dashboard() {
     );
   }
 
+  if (selectedMajorCoin) {
+    return (
+      <CoinDetailPage
+        coin={selectedMajorCoin}
+        onBack={() => setSelectedMajorCoin(null)}
+      />
+    );
+  }
+
   return (
     <div className="max-w-[1600px] mx-auto p-4 space-y-4">
       <div className="flex items-center justify-between">
@@ -145,7 +156,7 @@ export default function Dashboard() {
         <SimpleTableView coins={allCoins} loading={loading} onCoinSelect={handleCoinSelect} />
       ) : (
         <>
-          <MajorCoinsPanel />
+          <MajorCoinsPanel onCoinSelect={setSelectedMajorCoin} />
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <div className="lg:col-span-2" style={{ height: "400px" }}>
