@@ -46,21 +46,21 @@ interface AnalysisResult {
   timestamp: string;
 }
 
-const BINANCE_API = "https://api.binance.com";
+const COINGECKO_API = "https://api.coingecko.com/api/v3";
 
-async function fetchOHLCV(symbol: string, interval: string, limit: number): Promise<OHLCV[]> {
-  const { data } = await axios.get(`${BINANCE_API}/api/v3/klines`, {
-    params: { symbol, interval, limit },
-    timeout: 10000,
+async function fetchOHLCV(coinId: string, days: number): Promise<OHLCV[]> {
+  const { data } = await axios.get(`${COINGECKO_API}/coins/${coinId}/ohlc`, {
+    params: { vs_currency: "usd", days },
+    timeout: 15000,
   });
 
-  return data.map((k: unknown[]) => ({
-    time: k[0] as number,
-    open: parseFloat(k[1] as string),
-    high: parseFloat(k[2] as string),
-    low: parseFloat(k[3] as string),
-    close: parseFloat(k[4] as string),
-    volume: parseFloat(k[5] as string),
+  return data.map(([time, open, high, low, close]: [number, number, number, number, number]) => ({
+    time,
+    open,
+    high,
+    low,
+    close,
+    volume: 0,
   }));
 }
 
@@ -166,7 +166,7 @@ function clusterLevels(pivots: { price: number; type: "high" | "low" }[], thresh
   return levels.filter((l) => l.touches >= 2).sort((a, b) => b.touches - a.touches);
 }
 
-function detectConsolidation(candles: OHLCV[]): ConsolidationAnalysis {
+function detectConsolidation(candles: OHLCV[], coinName: string): ConsolidationAnalysis {
   const recent = candles.slice(-48);
   const closes = recent.map((c) => c.close);
   const rangeHigh = Math.max(...recent.map((c) => c.high));
@@ -186,7 +186,7 @@ function detectConsolidation(candles: OHLCV[]): ConsolidationAnalysis {
   let explanation = "";
   if (isConsolidating) {
     explanation =
-      "BTC beweegt zijwaarts in een nauwe range. Dit betekent dat kopers en verkopers in evenwicht zijn. " +
+      `${coinName} beweegt zijwaarts in een nauwe range. Dit betekent dat kopers en verkopers in evenwicht zijn. ` +
       "Een uitbraak (breakout) boven de bovenkant of onder de onderkant volgt vaak na zo'n consolidatie. " +
       "Hoe langer de consolidatie, hoe krachtiger de daaropvolgende beweging.";
   } else {
@@ -338,17 +338,12 @@ function buildChartLines(indicators: TechnicalIndicators, consolidation: Consoli
   return lines;
 }
 
-async function analyzeCoin(symbol: string, name: string): Promise<AnalysisResult> {
-  const [daily4h, daily1d] = await Promise.all([
-    fetchOHLCV(symbol, "4h", 200),
-    fetchOHLCV(symbol, "1d", 200),
-  ]);
-
-  const candles = daily1d.length >= 200 ? daily1d : daily4h;
+async function analyzeCoin(coinId: string, symbol: string, name: string): Promise<AnalysisResult> {
+  const candles = await fetchOHLCV(coinId, 365);
   const closes = candles.map((c) => c.close);
-  const currentPrice = closes[closes.length - 1];
+  const currentPrice = closes[candles.length - 1];
 
-  const prevDayClose = closes[closes.length - 2] ?? currentPrice;
+  const prevDayClose = closes[candles.length - 2] ?? currentPrice;
   const change24h = ((currentPrice - prevDayClose) / prevDayClose) * 100;
 
   const ema20Arr = calcEMA(closes, 20);
@@ -359,7 +354,7 @@ async function analyzeCoin(symbol: string, name: string): Promise<AnalysisResult
   const macd = calcMACD(closes);
   const bollinger = calcBollinger(closes);
   const { support, resistance } = findSupportResistance(candles);
-  const consolidation = detectConsolidation(candles);
+  const consolidation = detectConsolidation(candles, name);
 
   const indicators: TechnicalIndicators = {
     rsi,
@@ -395,8 +390,8 @@ async function analyzeCoin(symbol: string, name: string): Promise<AnalysisResult
 }
 
 const COINS = [
-  { symbol: "BTCUSDT", name: "Bitcoin" },
-  { symbol: "ETHUSDT", name: "Ethereum" },
+  { id: "bitcoin", symbol: "BTC", name: "Bitcoin" },
+  { id: "ethereum", symbol: "ETH", name: "Ethereum" },
 ];
 
 export async function getMajorCoinsAnalysis(): Promise<AnalysisResult[]> {
@@ -404,7 +399,7 @@ export async function getMajorCoinsAnalysis(): Promise<AnalysisResult[]> {
   const cached = await cacheGet<AnalysisResult[]>(cacheKey);
   if (cached) return cached;
 
-  const results = await Promise.all(COINS.map((c) => analyzeCoin(c.symbol, c.name)));
+  const results = await Promise.all(COINS.map((c) => analyzeCoin(c.id, c.symbol, c.name)));
 
   await cacheSet(cacheKey, results, 300);
   return results;
