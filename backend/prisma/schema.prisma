@@ -1,0 +1,124 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Coin {
+  id            String   @id @default(uuid())
+  chain         String
+  pairAddress   String
+  baseToken     String
+  quoteToken    String
+  name          String
+  symbol        String
+  priceUsd      Decimal? @db.Decimal(24, 12)
+  priceChange5m Decimal? @db.Decimal(10, 4)
+  priceChange1h Decimal? @db.Decimal(10, 4)
+  priceChange24h Decimal? @db.Decimal(10, 4)
+  volume24h     Decimal? @db.Decimal(24, 6)
+  liquidity     Decimal? @db.Decimal(24, 6)
+  marketCap     Decimal? @db.Decimal(24, 6)
+  txns24h       Int?
+  txns1h        Int?
+  txns5m        Int?
+  buyers24h     Int?
+  sellers24h    Int?
+  pairCreatedAt DateTime?
+  dexUrl        String?
+  imageUrl      String?
+  source        String   @default("dexscreener")
+  listedOnKucoin Boolean @default(false)
+  listedOnBitget Boolean @default(false)
+  whaleAccumulation Decimal? @db.Decimal(24, 6)
+  holderGrowth Decimal? @db.Decimal(10, 4)
+  socialVelocity Decimal? @db.Decimal(10, 4)
+  developerActivity Int?
+  smartMoneyScore Int?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  trendScores   TrendScore[]
+
+  @@unique([chain, pairAddress])
+  @@index([pairCreatedAt(sort: Desc)])
+  @@index([symbol])
+  @@index([marketCap(sort: Desc)])
+}
+
+model TrendScore {
+  id            String   @id @default(uuid())
+  coinId        String
+  score         Int
+  socialScore   Int      @default(0)
+  volumeScore   Int      @default(0)
+  liquidityScore Int     @default(0)
+  marketCapScore Int     @default(0)
+  ageScore      Int      @default(0)
+  exchangeScore Int      @default(0)
+  reversalScore Int      @default(0)
+  whaleScore    Int      @default(0)
+  holderScore   Int      @default(0)
+  velocityScore Int      @default(0)
+  developerScore Int     @default(0)
+  smartMoneyScore Int    @default(0)
+  mentions      Int      @default(0)
+  likes         Int      @default(0)
+  retweets      Int      @default(0)
+  sentiment     Decimal? @db.Decimal(5, 4)
+  calculatedAt  DateTime @default(now())
+
+  coin          Coin     @relation(fields: [coinId], references: [id], onDelete: Cascade)
+
+  @@index([coinId, calculatedAt(sort: Desc)])
+  @@index([score(sort: Desc)])
+}
+
+model UserProfile {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  alias         String?
+  passwordHash  String
+  language      String   @default("en")
+  timezone      String   @default("UTC")
+  theme         String   @default("dark")
+  bitgetLinked  Boolean  @default(false)
+  bitgetApiKey  String?
+  bitgetSecret  String?
+  bitgetPass    String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  watchlist     Watchlist[]
+  strategies    StrategyConfig[]
+}
+
+model Watchlist {
+  id            String   @id @default(uuid())
+  userId        String
+  coinId        String
+  addedAt       DateTime @default(now())
+
+  user          UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, coinId])
+}
+
+model StrategyConfig {
+  id            String   @id @default(uuid())
+  userId        String
+  strategyType  String
+  name          String
+  enabled       Boolean  @default(false)
+  params        Json     @default("{}")
+  coinFilter    Json?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user          UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, strategyType])
+}
