@@ -100,11 +100,11 @@ export default function SimpleCoinView({ coin }: SimpleCoinViewProps) {
             <div className="font-medium text-sm mb-1">{reversal.label}</div>
             <div className="text-xs opacity-80">
               {reversal.pattern === "classic" &&
-                "Prijs >5% gedaald in 24h en >2% in 1h, maar bounce in laatste 5 minuten. Mogelijke bodemvorming."}
+                "Price dropped >5% in 24h and >2% in 1h, but bounced in the last 5 minutes. Possible bottom formation."}
               {reversal.pattern === "slight_dip" &&
-                "Prijs >2% gedaald in het laatste uur maar vroege tekenen van herstel. Wacht op bevestiging."}
+                "Price dropped >2% in the last hour but showing early signs of recovery. Wait for confirmation."}
               {reversal.pattern === "strong_dip" &&
-                "Prijs >5% omlaag in 24h en daalt nog steeds. Geen herstel signaal — wacht op een bounce."}
+                "Price down >5% in 24h and still falling. No recovery signal — wait for a bounce."}
             </div>
           </div>
         )}

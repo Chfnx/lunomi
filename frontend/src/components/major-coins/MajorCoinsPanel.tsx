@@ -3,11 +3,11 @@ import { fetchMajorCoinsAnalysis } from "@/services/api";
 import type { MajorCoinAnalysis } from "@/types";
 
 const signalConfig: Record<string, { label: string; color: string; bg: string }> = {
-  strong_buy: { label: "Sterk Kopen", color: "text-emerald-400", bg: "bg-emerald-500/15" },
-  buy: { label: "Kopen", color: "text-green-400", bg: "bg-green-500/15" },
-  neutral: { label: "Neutraal", color: "text-yellow-400", bg: "bg-yellow-500/15" },
-  sell: { label: "Verkopen", color: "text-orange-400", bg: "bg-orange-500/15" },
-  strong_sell: { label: "Sterk Verkopen", color: "text-red-400", bg: "bg-red-500/15" },
+  strong_buy: { label: "Strong Buy", color: "text-emerald-400", bg: "bg-emerald-500/15" },
+  buy: { label: "Buy", color: "text-green-400", bg: "bg-green-500/15" },
+  neutral: { label: "Neutral", color: "text-yellow-400", bg: "bg-yellow-500/15" },
+  sell: { label: "Sell", color: "text-orange-400", bg: "bg-orange-500/15" },
+  strong_sell: { label: "Strong Sell", color: "text-red-400", bg: "bg-red-500/15" },
 };
 
 function formatPrice(price: number): string {
@@ -41,7 +41,7 @@ function CoinCard({ coin }: { coin: MajorCoinAnalysis }) {
       {coin.consolidation.isConsolidating && (
         <div className="mb-3 p-2 rounded bg-cyan-500/10 border border-cyan-500/20">
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-semibold text-cyan-400">Horizontale beweging</span>
+            <span className="text-xs font-semibold text-cyan-400">Sideways movement</span>
             <span className="text-xs text-gray-500">{coin.consolidation.duration}</span>
           </div>
           <p className="text-xs text-gray-400 leading-relaxed">{coin.consolidation.explanation}</p>
@@ -70,7 +70,7 @@ function CoinCard({ coin }: { coin: MajorCoinAnalysis }) {
       </div>
 
       <div className="mb-3">
-        <div className="text-[10px] text-gray-500 uppercase mb-1">Voorspelling</div>
+        <div className="text-[10px] text-gray-500 uppercase mb-1">Prediction</div>
         <p className="text-xs text-gray-300 leading-relaxed">{coin.prediction}</p>
       </div>
 
@@ -78,13 +78,13 @@ function CoinCard({ coin }: { coin: MajorCoinAnalysis }) {
         onClick={() => setExpanded(!expanded)}
         className="text-xs text-blue-400 hover:text-blue-300 mb-2"
       >
-        {expanded ? "Verberg details" : "Toon analyse details"}
+        {expanded ? "Hide details" : "Show analysis details"}
       </button>
 
       {expanded && (
         <div className="space-y-2 mt-2 border-t border-surface-700 pt-2">
           <div>
-            <div className="text-[10px] text-gray-500 uppercase mb-1">Technische analyse</div>
+            <div className="text-[10px] text-gray-500 uppercase mb-1">Technical Analysis</div>
             <ul className="space-y-1">
               {coin.analysis.map((line, i) => (
                 <li key={i} className="text-xs text-gray-400 flex items-start gap-1.5">
@@ -96,7 +96,7 @@ function CoinCard({ coin }: { coin: MajorCoinAnalysis }) {
           </div>
 
           <div>
-            <div className="text-[10px] text-gray-500 uppercase mb-1">Chart lijnen</div>
+            <div className="text-[10px] text-gray-500 uppercase mb-1">Chart Lines</div>
             <div className="flex flex-wrap gap-1.5">
               {coin.chartLines.map((line, i) => (
                 <span
@@ -122,7 +122,7 @@ function CoinCard({ coin }: { coin: MajorCoinAnalysis }) {
             )}
             {coin.indicators.resistance.length > 0 && (
               <div>
-                <div className="text-[10px] text-gray-500 uppercase mb-1">Weerstand</div>
+                <div className="text-[10px] text-gray-500 uppercase mb-1">Resistance</div>
                 {coin.indicators.resistance.map((r, i) => (
                   <div key={i} className="text-xs text-red-400">{formatPrice(r)}</div>
                 ))}
@@ -164,7 +164,7 @@ export default function MajorCoinsPanel() {
 
   return (
     <div className="space-y-2">
-      <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">Markt Analyse</h2>
+      <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">Market Analysis</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {coins.map((coin) => (
           <CoinCard key={coin.symbol} coin={coin} />
