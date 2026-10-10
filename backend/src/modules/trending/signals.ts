@@ -37,7 +37,7 @@ async function calculateWhaleAccumulation(coinId: string): Promise<number> {
   if (!coin) return 0;
 
   const txns24h = coin.txns24h ?? 0;
-  const volume24h = coin.volume24h ?? 0;
+  const volume24h = Number(coin.volume24h ?? 0);
 
   if (txns24h === 0 || volume24h === 0) return 0;
 
@@ -136,8 +136,8 @@ async function calculateSmartMoneyScore(coinId: string): Promise<number> {
   if (!coin) return 0;
 
   const buyers24h = coin.buyers24h ?? 0;
-  const volume24h = coin.volume24h ?? 0;
-  const liquidity = coin.liquidity ?? 0;
+  const volume24h = Number(coin.volume24h ?? 0);
+  const liquidity = Number(coin.liquidity ?? 0);
 
   if (buyers24h === 0 || volume24h === 0 || liquidity === 0) return 0;
 

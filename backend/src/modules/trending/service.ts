@@ -2,7 +2,6 @@ import prisma from "../../shared/db/prisma.js";
 import { cacheGet, cacheSet } from "../../shared/cache/redis.js";
 import { getTrendingPools, type GeckoTerminalPool } from "../coins/geckoterminal.js";
 import { calculateSignalMetrics } from "./signals.js";
-import type { Coin } from "@prisma/client";
 
 const CACHE_KEY_TRENDING = "trending:coins";
 const CACHE_KEY_SCORES = "trending:scores";
@@ -243,7 +242,7 @@ export async function fetchTrendingCoins(): Promise<TrendingCoin[]> {
       orderBy: { createdAt: "desc" },
     });
 
-    pools = dbCoins.map((coin: Coin) => ({
+    pools = dbCoins.map((coin) => ({
       id: `${coin.chain}_${coin.pairAddress}`,
       type: "pool",
       attributes: {
