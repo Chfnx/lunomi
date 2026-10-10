@@ -10,8 +10,7 @@ interface CoinProfileProps {
 }
 
 function getTradingViewSymbol(symbol: string): string {
-  const s = symbol.toUpperCase();
-  return `BINANCE:${s}USDT`;
+  return `${symbol.toUpperCase()}USDT`;
 }
 
 function CoinChart({ symbol, chain, pairAddress }: { symbol: string; chain: string; pairAddress: string }) {

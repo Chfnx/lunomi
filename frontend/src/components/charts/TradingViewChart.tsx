@@ -6,7 +6,7 @@ interface TradingViewChartProps {
   pairAddress?: string;
 }
 
-function TradingViewChart({ symbol = "BINANCE:BTCUSDT", chain, pairAddress }: TradingViewChartProps) {
+function TradingViewChart({ symbol = "BTCUSDT", chain, pairAddress }: TradingViewChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const tvSymbol = chain && pairAddress
