@@ -2,9 +2,12 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { fetchNewCoins, fetchTrending, syncCoins, syncTrending } from "@/services/api";
 import type { NewCoin, TrendingCoin } from "@/types";
 import TrendingTable from "@/components/trending/TrendingTable";
+import SimpleTableView from "@/components/trending/SimpleTableView";
 import TradingViewChart from "@/components/charts/TradingViewChart";
 import CoinProfile from "@/components/coin/CoinProfile";
 import MajorCoinsPanel from "@/components/major-coins/MajorCoinsPanel";
+
+type ViewMode = "simple" | "detailed";
 
 function newCoinToTrending(coin: NewCoin): TrendingCoin {
   return {
@@ -43,6 +46,7 @@ export default function Dashboard() {
   const [newCoins, setNewCoins] = useState<NewCoin[]>([]);
   const [trendingCoins, setTrendingCoins] = useState<TrendingCoin[]>([]);
   const [selectedCoin, setSelectedCoin] = useState<TrendingCoin | null>(null);
+  const [viewMode, setViewMode] = useState<ViewMode>("simple");
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
 
@@ -105,11 +109,31 @@ export default function Dashboard() {
 
   return (
     <div className="max-w-[1600px] mx-auto p-4 space-y-4">
-      <MajorCoinsPanel />
-
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">All Coins</h1>
         <div className="flex items-center gap-3">
+          <div className="flex gap-1 bg-surface-800 rounded-lg p-1">
+            <button
+              onClick={() => setViewMode("simple")}
+              className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                viewMode === "simple"
+                  ? "bg-surface-600 text-white"
+                  : "text-gray-400 hover:text-gray-200"
+              }`}
+            >
+              Eenvoudig
+            </button>
+            <button
+              onClick={() => setViewMode("detailed")}
+              className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                viewMode === "detailed"
+                  ? "bg-surface-600 text-white"
+                  : "text-gray-400 hover:text-gray-200"
+              }`}
+            >
+              Gedetailleerd
+            </button>
+          </div>
           <span className="text-xs text-gray-500">{allCoins.length} coins</span>
           <button onClick={handleSync} disabled={syncing} className="btn-primary text-sm">
             {syncing ? "Syncing..." : "Refresh"}
@@ -117,26 +141,34 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-2" style={{ height: "400px" }}>
-          <TradingViewChart />
-        </div>
-        <div className="card">
-          <h3 className="text-sm font-semibold text-gray-300 mb-2">Quick Stats</h3>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <div className="text-xs text-gray-500">New Coins</div>
-              <div className="text-xl font-bold text-gray-200">{newCoins.length}</div>
+      {viewMode === "simple" ? (
+        <SimpleTableView coins={allCoins} loading={loading} onCoinSelect={handleCoinSelect} />
+      ) : (
+        <>
+          <MajorCoinsPanel />
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div className="lg:col-span-2" style={{ height: "400px" }}>
+              <TradingViewChart />
             </div>
-            <div>
-              <div className="text-xs text-gray-500">Trending</div>
-              <div className="text-xl font-bold text-gray-200">{trendingCoins.length}</div>
+            <div className="card">
+              <h3 className="text-sm font-semibold text-gray-300 mb-2">Quick Stats</h3>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <div className="text-xs text-gray-500">New Coins</div>
+                  <div className="text-xl font-bold text-gray-200">{newCoins.length}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-gray-500">Trending</div>
+                  <div className="text-xl font-bold text-gray-200">{trendingCoins.length}</div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <TrendingTable coins={allCoins} loading={loading} onCoinSelect={handleCoinSelect} />
+          <TrendingTable coins={allCoins} loading={loading} onCoinSelect={handleCoinSelect} />
+        </>
+      )}
     </div>
   );
 }
