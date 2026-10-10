@@ -133,7 +133,7 @@ export default function CoinProfile({ coin, onBack }: CoinProfileProps) {
               : "text-gray-400 hover:text-gray-200"
           }`}
         >
-          Eenvoudig
+          Simple
         </button>
         <button
           onClick={() => setViewMode("detailed")}
@@ -143,7 +143,7 @@ export default function CoinProfile({ coin, onBack }: CoinProfileProps) {
               : "text-gray-400 hover:text-gray-200"
           }`}
         >
-          Gedetailleerd
+          Detailed
         </button>
       </div>
 

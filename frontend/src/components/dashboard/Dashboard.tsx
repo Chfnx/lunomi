@@ -121,7 +121,7 @@ export default function Dashboard() {
                   : "text-gray-400 hover:text-gray-200"
               }`}
             >
-              Eenvoudig
+              Simple
             </button>
             <button
               onClick={() => setViewMode("detailed")}
@@ -131,7 +131,7 @@ export default function Dashboard() {
                   : "text-gray-400 hover:text-gray-200"
               }`}
             >
-              Gedetailleerd
+              Detailed
             </button>
           </div>
           <span className="text-xs text-gray-500">{allCoins.length} coins</span>
