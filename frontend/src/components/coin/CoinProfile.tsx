@@ -1,8 +1,11 @@
-import { useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { formatUsd, formatPercent, getPercentColor, detectReversalPattern } from "@/utils/format";
 import TrendScoreBadge from "@/components/common/TrendScoreBadge";
 import ScoreBreakdown from "@/components/charts/ScoreBreakdown";
+import SimpleCoinView from "./SimpleCoinView";
 import type { TrendingCoin } from "@/types";
+
+type ViewMode = "simple" | "detailed";
 
 interface CoinProfileProps {
   coin: TrendingCoin;
@@ -84,6 +87,7 @@ function MetricCard({ label, value, sub }: { label: string; value: string; sub?:
 }
 
 export default function CoinProfile({ coin, onBack }: CoinProfileProps) {
+  const [viewMode, setViewMode] = useState<ViewMode>("simple");
   const reversal = detectReversalPattern(coin);
 
   const kucoinUrl = `https://www.kucoin.com/price/${coin.symbol}`;
@@ -120,6 +124,33 @@ export default function CoinProfile({ coin, onBack }: CoinProfileProps) {
         </div>
       </div>
 
+      <div className="flex gap-1 bg-surface-800 rounded-lg p-1 w-fit">
+        <button
+          onClick={() => setViewMode("simple")}
+          className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
+            viewMode === "simple"
+              ? "bg-surface-600 text-white"
+              : "text-gray-400 hover:text-gray-200"
+          }`}
+        >
+          Eenvoudig
+        </button>
+        <button
+          onClick={() => setViewMode("detailed")}
+          className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
+            viewMode === "detailed"
+              ? "bg-surface-600 text-white"
+              : "text-gray-400 hover:text-gray-200"
+          }`}
+        >
+          Gedetailleerd
+        </button>
+      </div>
+
+      {viewMode === "simple" ? (
+        <SimpleCoinView coin={coin} />
+      ) : (
+        <>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2" style={{ height: "500px" }}>
           <CoinChart
@@ -275,6 +306,8 @@ export default function CoinProfile({ coin, onBack }: CoinProfileProps) {
           )}
         </div>
       </div>
+        </>
+      )}
     </div>
   );
 }
