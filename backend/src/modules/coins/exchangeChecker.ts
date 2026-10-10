@@ -14,8 +14,9 @@ async function checkKucoinListing(symbol: string): Promise<boolean> {
     const success = response.status >= 200 && response.status < 400;
     console.log(`[ExchangeChecker] KuCoin check for ${symbol}: ${response.status} -> ${success}`);
     return success;
-  } catch (error) {
-    console.log(`[ExchangeChecker] KuCoin check for ${symbol}: FAILED - ${error.message}`);
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error);
+    console.log(`[ExchangeChecker] KuCoin check for ${symbol}: FAILED - ${msg}`);
     return false;
   }
 }
@@ -27,8 +28,9 @@ async function checkBitgetListing(symbol: string): Promise<boolean> {
     const success = response.status >= 200 && response.status < 400;
     console.log(`[ExchangeChecker] Bitget check for ${symbol}: ${response.status} -> ${success}`);
     return success;
-  } catch (error) {
-    console.log(`[ExchangeChecker] Bitget check for ${symbol}: FAILED - ${error.message}`);
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error);
+    console.log(`[ExchangeChecker] Bitget check for ${symbol}: FAILED - ${msg}`);
     return false;
   }
 }

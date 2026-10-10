@@ -32,7 +32,7 @@ export async function calculateSignalMetrics(
   };
 }
 
-async function calculateWhaleAccumulation(coinId: string): number {
+async function calculateWhaleAccumulation(coinId: string): Promise<number> {
   const coin = await prisma.coin.findUnique({ where: { id: coinId } });
   if (!coin) return 0;
 
@@ -52,7 +52,7 @@ async function calculateWhaleAccumulation(coinId: string): number {
   return Math.min(100, Math.round((avgTxSize / whaleThreshold) * 100));
 }
 
-async function calculateHolderGrowth(coinId: string): number {
+async function calculateHolderGrowth(coinId: string): Promise<number> {
   const coin = await prisma.coin.findUnique({ where: { id: coinId } });
   if (!coin) return 0;
 
@@ -77,7 +77,7 @@ async function calculateHolderGrowth(coinId: string): number {
   return 0;
 }
 
-async function calculateSocialVelocity(coinId: string): number {
+async function calculateSocialVelocity(coinId: string): Promise<number> {
   const recentScores = await prisma.trendScore.findMany({
     where: { coinId },
     orderBy: { calculatedAt: "desc" },
@@ -102,7 +102,7 @@ async function calculateSocialVelocity(coinId: string): number {
   return 0;
 }
 
-async function calculateDeveloperActivity(symbol: string): number {
+async function calculateDeveloperActivity(symbol: string): Promise<number> {
   try {
     const response = await fetch(
       `https://api.github.com/search/repositories?q=${symbol}+crypto+blockchain&sort=updated&order=desc&per_page=1`,
@@ -131,7 +131,7 @@ async function calculateDeveloperActivity(symbol: string): number {
   }
 }
 
-async function calculateSmartMoneyScore(coinId: string): number {
+async function calculateSmartMoneyScore(coinId: string): Promise<number> {
   const coin = await prisma.coin.findUnique({ where: { id: coinId } });
   if (!coin) return 0;
 
