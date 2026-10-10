@@ -44,4 +44,20 @@ export async function fetchMajorCoinsAnalysis(): Promise<MajorCoinAnalysis[]> {
   return data.data;
 }
 
+export interface Candle {
+  time: number;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+}
+
+export async function fetchCoinOHLCV(symbol: string, days = 90): Promise<Candle[]> {
+  const { data } = await api.get<ApiResponse<Candle[]>>(`/major-coins/ohlcv/${symbol}`, {
+    params: { days },
+  });
+  return data.data;
+}
+
 export default api;

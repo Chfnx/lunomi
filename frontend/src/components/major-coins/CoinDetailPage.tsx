@@ -1,5 +1,8 @@
+import { useState, useEffect } from "react";
 import type { MajorCoinAnalysis } from "@/types";
+import { fetchCoinOHLCV, type Candle } from "@/services/api";
 import ATMSimulation from "./ATMSimulation";
+import ATMChart from "./ATMChart";
 
 interface CoinDetailPageProps {
   coin: MajorCoinAnalysis;
@@ -22,6 +25,11 @@ function formatUsd(value: number): string {
 
 export default function CoinDetailPage({ coin, onBack }: CoinDetailPageProps) {
   const sig = signalConfig[coin.signal];
+  const [candles, setCandles] = useState<Candle[]>([]);
+
+  useEffect(() => {
+    fetchCoinOHLCV(coin.symbol, 90).then(setCandles).catch(() => {});
+  }, [coin.symbol]);
 
   return (
     <div className="max-w-4xl mx-auto p-4 space-y-4">
@@ -136,6 +144,15 @@ export default function CoinDetailPage({ coin, onBack }: CoinDetailPageProps) {
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="card">
+        <h3 className="text-sm font-semibold text-gray-300 mb-3">Price Chart with ATM Grid</h3>
+        {candles.length > 0 ? (
+          <ATMChart coin={coin} candles={candles} />
+        ) : (
+          <div className="h-[400px] flex items-center justify-center text-gray-500 text-sm">Loading chart...</div>
+        )}
       </div>
 
       <div className="card">

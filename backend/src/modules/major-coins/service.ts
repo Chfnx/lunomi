@@ -389,17 +389,30 @@ async function analyzeCoin(coinId: string, symbol: string, name: string): Promis
   };
 }
 
-const COINS = [
-  { id: "bitcoin", symbol: "BTC", name: "Bitcoin" },
-  { id: "ethereum", symbol: "ETH", name: "Ethereum" },
-];
+const COINS: Record<string, { id: string; symbol: string; name: string }> = {
+  BTC: { id: "bitcoin", symbol: "BTC", name: "Bitcoin" },
+  ETH: { id: "ethereum", symbol: "ETH", name: "Ethereum" },
+};
+
+const COIN_LIST = Object.values(COINS);
+
+export async function getCoinOHLCV(symbol: string, days: number): Promise<OHLCV[]> {
+  const coin = COINS[symbol.toUpperCase()];
+  if (!coin) throw new Error(`Unknown symbol: ${symbol}`);
+  const cacheKey = `major-coins:ohlcv:${symbol}:${days}`;
+  const cached = await cacheGet<OHLCV[]>(cacheKey);
+  if (cached) return cached;
+  const candles = await fetchOHLCV(coin.id, days);
+  await cacheSet(cacheKey, candles, 300);
+  return candles;
+}
 
 export async function getMajorCoinsAnalysis(): Promise<AnalysisResult[]> {
   const cacheKey = "major-coins:analysis";
   const cached = await cacheGet<AnalysisResult[]>(cacheKey);
   if (cached) return cached;
 
-  const results = await Promise.all(COINS.map((c) => analyzeCoin(c.id, c.symbol, c.name)));
+  const results = await Promise.all(COIN_LIST.map((c) => analyzeCoin(c.id, c.symbol, c.name)));
 
   await cacheSet(cacheKey, results, 300);
   return results;
